@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-import mysql.connector
+from mysql.connector import MySQLConnection
+from mysql.connector import Error
 
 #Conect to database 
 mydbProyecto = mysql.connector.connect(
@@ -15,6 +16,82 @@ mydbProyecto = mysql.connector.connect(
 cursor = mydbProyecto.cursor()
 
 app = FastAPI()
+
+class Usuarios(BaseModel):
+    id: int
+    nombreUsuario: str
+    contraseña: str
+    rol:
+    empleadoId:
+    fechaCreacion:
+
+@app.get("/usuarios", status_code=status.HTTP_200_OK)
+def get_usuarios():
+    select_query = "SELECT * FROM usuarios"
+    cursor.execute(select_query)
+    results = cursor.fetchall()
+    return results 
+
+@app.get("/usuarios/{id}", status_code=status.HTTP_200_OK)
+def get_usuarios_by_id(id:int):
+    select_query = "SELECT * FROM usuarios WHERE id = %s"
+    cursor.execute(select_query, (id,))
+    result = cursor.fetchone()
+    if result:
+        return result
+    else: 
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+@app.post("/usuarios", status_code=status.HTTP_201_CREATED)
+def insert_usuarios(usuarios: Usuarios):
+    insert_query = """
+    INSERT INTO usuarios (id, nombre_usuario, rol, empleado_id, fecha_creacion)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    values = (usuarios.id, usuarios.nombreUsuario, usuarios.rol, usuarios.empleadoId, usuarios.fechaCreacion)
+
+    try:
+        cursor.execute(insert_query, values)
+        mydbProyecto.commit()
+    except mysql.connector.Error as error:
+        raise HTTPException(status_code=400, detail=f"Error:{error}")
+
+@app.post("/usuarios", status_code=status.HTTP_201_CREATED) 
+def insert_usuarios(usuarios: Usuarios): 
+    insert_query = """ 
+    INSERT INTO empleados (id, nombre, rol, informacion_contacto) 
+    VALUES (%s, %s, %s, %s) """ 
+    values = (usuarios.id, usuarios.nombreUsuario, usuarios.rol, usuarios.empleadoId, usuarios.fechaCreacion) 
+    try: 
+        cursor.execute(insert_query, values) 
+        mydbProyecto.commit() 
+        return {"message": "Empleado creado exitosamente"} 
+    except mysql.connector.Error as error: 
+        raise HTTPException(status_code=400, detail=f"Error:{error}") 
+        
+# Actualizar un empleado (Update) 
+@app.put("/usuarios/{id}", status_code=status.HTTP_200_OK) 
+def update_usuarios(id: int, usuarios: Usuarios): 
+    update_query = """ 
+    UPDATE usuarios SET nombreUsuario = %s, rol = %s, empleadoId = %s, fechaCreacion = %s WHERE id = %s """ 
+    values = (usuarios.nombreUsuario, usuarios.rol, usuarios.empleadoId, usuarios.fechaCreacion, id) 
+    try: 
+        cursor.execute(update_query, values) 
+        mydbProyecto.commit() return {"message": "Usuario actualizado exitosamente"} 
+    except mysql.connector.Error as error: 
+        raise HTTPException(status_code=400, detail=f"Error: {error}") 
+
+# Eliminar un empleado (Delete) 
+@app.delete("/usuarios/{id}", status_code=status.HTTP_200_OK) 
+def delete_usuarios(id: int): 
+    delete_query = "DELETE FROM usuarios WHERE id = %s" 
+    try: 
+        cursor.execute(delete_query, (id,)) 
+        mydbProyecto.commit() 
+        return {"message": "Usuario eliminado exitosamente"} 
+    except mysql.connector.Error as error: 
+        raise HTTPException(status_code=400, detail=f"Error: {error}"
+    
 
 class Empleado(BaseModel):
     id: int
