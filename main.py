@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from mysql.connector import MySQLConnection
 from mysql.connector import Error
+from fastapi.middleware.cors import CORSMiddleware
 
 #Conect to database 
 mydbProyecto = mysql.connector.connect(
@@ -11,19 +12,27 @@ mydbProyecto = mysql.connector.connect(
     database="b82t0tp5jhudag9bplxj",
     port=3306
 )
-
+ 
 #Create a cursor Object
 cursor = mydbProyecto.cursor()
 
 app = FastAPI()
 
+#Configuracion de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], #Permite todas las solicitudes de cualquier origen(tambien dominios especificos)
+    allow_credentials=True,
+    allow_methods=["*"], #Permite todos los metodos HTTP(GET, POST, etc)
+    allow_headers=["*"], #Permite todos los encabezados.
+
 class Usuarios(BaseModel):
     id: int
     nombreUsuario: str
     contraseña: str
-    rol:
-    empleadoId:
-    fechaCreacion:
+    rol: str 
+    empleadoId: str 
+    fechaCreacion: str
 
 @app.get("/usuarios", status_code=status.HTTP_200_OK)
 def get_usuarios():
