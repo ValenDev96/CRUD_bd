@@ -25,6 +25,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"], #Permite todos los metodos HTTP(GET, POST, etc)
     allow_headers=["*"], #Permite todos los encabezados.
+)
 
 class Usuarios(BaseModel):
     id: int
