@@ -65,7 +65,7 @@ def insert_usuarios(usuarios: Usuarios):
     except mysql.connector.Error as error:
         raise HTTPException(status_code=400, detail=f"Error:{error}")
 
-@app.post("/usuarios", status_code=status.HTTP_201_CREATED) 
+@app.post("/usuarios2", status_code=status.HTTP_201_CREATED) 
 def insert_usuarios(usuarios: Usuarios): 
     insert_query = """ 
     INSERT INTO empleados (id, nombre, rol, informacion_contacto) 
